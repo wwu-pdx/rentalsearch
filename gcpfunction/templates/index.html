@@ -35,30 +35,30 @@
         <input type="number" class="form-control bath" id="bath" min="1" max="99">
       </div>
     </div>
+
     <div class="form-row">
-      <div class="form-group col-md-3">
+      <div class="form-group col-md-6">
         <label for="address">Address</label>
         <input type="text" class="form-control addr" id="addr" placeholder="123 Main St, Conway, SC 29526">
-        <small id="passwordHelpBlock" class="form-text text-muted">
+        <small id="addrHelpBlock" class="form-text text-muted">
           pass an optional address for looking up a specific property. The address should be formatted as street address, city, state zip
         </small>
       </div>
-      <div class="form-group col-md-3">
-        <label for="address">Address</label>
-        <input type="text" class="form-control addr" id="addr" placeholder="123 Main St, Conway, SC 29526">
-        <small id="passwordHelpBlock" class="form-text text-muted">
+      <div class="form-group col-md-6">
+        <label for="address">Radius</label>
+        <input type="number" class="form-control radius" id="radius" min="10" max="200">
+        <small id="radiusHelpBlock" class="form-text text-muted">
           filter listings within this specified number of kilometers. You must provide an address parameters when using a radius search
         </small>
       </div>
     </div>
-    
+
     <div class="form-row">
-      <div class="form-group col-md-3">
+      <div class="form-group col-md-6">
         <button type="submit" class="btn btn-primary">Submit</button>
       </div>
-      <div class="form-group col-md-3">
-        <button type="submit" class="btn btn-primary">Submit</button>
-        <button type="reset" class="btn btn btn-secondary col">Reset</button>
+      <div class="form-group col-md-6">
+        <button type="reset" class="btn btn-secondary">Reset</button>
       </div>
     </div>
     
@@ -69,15 +69,17 @@
 <div>
   <form action="/" method = "post" >
 
-    {% for d in data %}
-    <div class="form-row">
-      <div class="form-group ">
-        <label for="city">City</label>
-        <input type="text" class="form-control city" id="city" placeholder="Portland" required>
-      </div>
-      {% endfor %}
     
-  
+   <ol>
+     
+    {% for d in data %}
+    <li>
+      {{d}}
+    </li>
+    {% endfor %}
+
+   </ol>
+   
   </form>
 
 </div>
