@@ -1,30 +1,71 @@
 from flask import redirect, request, url_for, render_template
 from flask.views import MethodView
-from collections import OrderedDict
 
+from collections import OrderedDict
+import requests
+from search import Search
 
 class Index(MethodView):
+
+	# def get(self):
+	# 	print("get")
+	# 	return render_template('index.html')
+
+
 	def get(self):
-		return render_template('index.html')
+		
+		if request.args.get('data'):
+			data = request.args.get('data')
+			return render_template('index.html', data=data)
+		else:	
+			return render_template('index.html')
+	
+	
 
 	def post(self):
 
-		city = flask.request.form['city']
-		state = flask.request.form['state']
+		print("post")
 
-		if city and state:
+		city = request.form['city']
+		state = request.form['state']
+		bed = request.form['bed']
+		bath = request.form['bath']
+		limit=10
+		offset =1
 
 		url = "https://realty-mole-property-api.p.rapidapi.com/rentalListings"
 
-		query = {"city":city,"state":state, "status"="Active"}
-
 		headers = {
-			'x-rapidapi-host': "realty-mole-property-api.p.rapidapi.com",
-			'x-rapidapi-key': "e22db4aecdmshd349a536e367dffp141a7djsn78c642d73125"
-			}
+                'x-rapidapi-host': "realty-mole-property-api.p.rapidapi.com",
+                'x-rapidapi-key': "e22db4aecdmshd349a536e367dffp141a7djsn78c642d73125"
+                }
+		
+		if city and state:
+			query = f"/rentalListings?city={city}&state={state}"
+			#query = {"city":city,"state":state,  "limit": 2, "offset":1}
 
-		data = request("GET", url, headers=headers, params=query)
-		return render_template('index.html', data=data)
+			data = Search().search(query)
+			
+
+		#print(data)
+		#return redirect(url_for('index', data = {"redic":"post"}))
+		return render_template('index.html', query=query, data=data)
+	
+	# def search(query):
+	# 	print(query)
+	# 	data={}
+	# 	if len(query) >0:
+	# 		print(query)
+	# 		url = "https://realty-mole-property-api.p.rapidapi.com/rentalListings"
+
+	# 		headers = {
+	# 				'x-rapidapi-host': "realty-mole-property-api.p.rapidapi.com",
+	# 				'x-rapidapi-key': "e22db4aecdmshd349a536e367dffp141a7djsn78c642d73125"
+	# 				}
+
+	# 		data = requests.request("GET", url, headers=headers, params=query)
+	# 	print(data)
+	# 	# return data
 
 # def main(request):
 # def main():

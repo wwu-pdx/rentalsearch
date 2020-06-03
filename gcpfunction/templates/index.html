@@ -3,50 +3,50 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta http-equiv="cache-control" content="no-cache" />
     <link
       rel="stylesheet"
       type="text/css"
       href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css"
     />
-    <link rel="stylesheet" href="5-bootstrap-grid.css" />
+   
     <title>Apartment-Housing Rental</title>
   </head>
 <body >
 <div>
 <h1 style="text-align:center">Search for Apartments or Houses</h1>
 <div>
-  <form action="{{url_for('index')}}" method = "post" >
+  <form action="/" method = "post" >
     <div class="form-row">
       <div class="form-group col-md-3">
         <label for="city">City</label>
-        <input type="text" class="form-control city" id="city" placeholder="Portland" required>
+        <input type="text" class="form-control city" id="city" placeholder="Portland" name="city" value= "Hillsboro" required>
       </div>
       <div class="form-group col-md-3">
         <label for="state">State</label>
-        <input type="text" class="form-control state" id="state" placeholder="OR" required>
+        <input type="text" class="form-control state" id="state" placeholder="OR"  name="state" value= "OR" required>
       </div>
       <div class="form-group col-md-3">
         <label for="bed">Bedroom</label>
-        <input type="number" class="form-control bed" id="bed" min="1" max="99">
+        <input type="number" class="form-control bed" id="bed" min="1" max="99" value="1" name="bed" required>
       </div>
       <div class="form-group col-md-3">
         <label for="bath">Bathroom</label>
-        <input type="number" class="form-control bath" id="bath" min="1" max="99">
+        <input type="number" class="form-control bath" id="bath" min="1" max="99"  value="1" name="bath" required>
       </div>
     </div>
 
     <div class="form-row">
       <div class="form-group col-md-6">
         <label for="address">Address</label>
-        <input type="text" class="form-control addr" id="addr" placeholder="123 Main St, Conway, SC 29526">
+        <input type="text" class="form-control addr" id="addr" placeholder="123 Main St, Conway, SC 29526"  name="addr">
         <small id="addrHelpBlock" class="form-text text-muted">
           pass an optional address for looking up a specific property. The address should be formatted as street address, city, state zip
         </small>
       </div>
       <div class="form-group col-md-6">
-        <label for="address">Radius</label>
-        <input type="number" class="form-control radius" id="radius" min="10" max="200">
+        <label for="radius">Radius</label>
+        <input type="number" class="form-control radius" id="radius" min="10" max="200"  name="radius">
         <small id="radiusHelpBlock" class="form-text text-muted">
           filter listings within this specified number of kilometers. You must provide an address parameters when using a radius search
         </small>
@@ -65,7 +65,8 @@
   </form>
   
 </div>
-
+{{query}}
+{{data}}
 <div>
   <form action="/" method = "post" >
 
@@ -84,7 +85,10 @@
 
 </div>
 
+<script>
 
+
+</script>
 
 
 
