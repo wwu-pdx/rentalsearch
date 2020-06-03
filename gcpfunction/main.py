@@ -1,17 +1,29 @@
-from flask import render_template
-from pyzillow.pyzillow import ZillowWrapper, GetDeepSearchResults
+from flask import render_template, escape
 import pprint
 
+
 def main(request):
+#def main():
 	
-	address = '1600 Pennsylvania Ave NW, Washington, DC'
-	zipcode = '20006'
-	zillow_data = ZillowWrapper('X1-ZWz176n7hv7nd7_7dhgw')
-	deep_search_response = zillow_data.get_deep_search_results(address,zipcode)
-	result = GetDeepSearchResults(deep_search_response)
-	#print(result.zillow_id)
-	#pp = pprint.PrettyPrinter(indent=2)
-	#pp.pprint (result.zillow_id)
+	request_json = request.get_json(silent=True)
+	city = request_json['city']
+	state = request_json['state']
+
+	if city and state:
+
+		url = "https://realty-mole-property-api.p.rapidapi.com/rentalListings"
+
+		querystring = {"city":city,"state":state, "status"="Active"}
+
+		headers = {
+			'x-rapidapi-host': "realty-mole-property-api.p.rapidapi.com",
+			'x-rapidapi-key': "e22db4aecdmshd349a536e367dffp141a7djsn78c642d73125"
+			}
+
+		data = request("GET", url, headers=headers, params=querystring)
 	
-	return render_template(f'main.html', result=result)
+	return render_template(f'main.html', data=data)
+
+# if __name__ == "__main__":
+# 	main()
 
