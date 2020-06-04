@@ -108,7 +108,7 @@
               <label class="item"  for="geo{{loop.index}}">
                 <b>{{d.propertyType}}: &nbsp; {{d.bathrooms}}baths &nbsp; {{d.bedrooms}}beds &nbsp; {{d.squareFootage}}sqft &nbsp; ${{d.price}} &nbsp; {{d.bedrooms}}beds &nbsp; {{d.daysOnMarket}}&nbsp; days on market </b>
                 <small> (Address: {{d.rawAddress}})</small>
-                <input class="check-item" type="checkbox" name="geodata" value="la" id = "geo{{loop.index}}">
+                <input class="check-item" type="checkbox" name="geodata" value="{{d}}" id = "geo{{loop.index}}">
               </label>
               </li>
              </div>
@@ -130,13 +130,13 @@
         <label for="addrm">Starting Address:
         <input type="text" class="addrm" id="addrm" placeholder="123 Main St"  name="addrm"> 
      
-        <button type="submit" class="btn btn-primary btnm">Add Start and Destinations</button>
+        <button type="submit" class="btn btn-primary btnm" id ="mapbtn">Add Start and Destinations</button>
  
     </div>
 
     <!--google map-->
     <div class="row-11">
-      <div sytle="height:200px; border:solid 1px black">
+      <div sytle="height:200px; border:solid 1px black" id= "map">
 
       </div>
     </div>
@@ -228,12 +228,49 @@
 
 
 
+  function initMap() {
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 8,
+          center: {lat: 45.52345, lng: -122.67621}//
+        });
+      
+       var geocoder = new google.maps.Geocoder();
+       
 
+        document.getElementById('mapbtn').addEventListener('click', function() {
+          geocodeAddress(geocoder, map);
+        });
+      }
+      
+     function geocodeAddress(geocoder, resultsMap) {
+        
+        //var adds=["1100 Lloyd Center, Portland, OR 97232", "9700 SW Washington Square Rd, Tigard, OR 97223"]
+        //var adds={{adds|safe}}
+        for (i = 0; i < adds.length; i++) {
+        geocoder.geocode({'address': adds[i]}, function(results, status) {
+          if (status === 'OK') {
+            resultsMap.setCenter(results[0].geometry.location);
+            var marker = new google.maps.Marker({
+              map: resultsMap,
+              position: results[0].geometry.location
+            });
+           //float window to show first return address from google map
+           var infowindow = new google.maps.InfoWindow;
+           infowindow.setContent(results[0].formatted_address);
+           marker.addListener('click', function() {
+            infowindow.open(map, marker);
+           });
+          } else {
+            alert('Geocode was not successful for the following reason: ' + status);
+          }
+        });
+    }
+   }
 
 
 </script>
 
-
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAnqtGnBhp7dsOKviCTt4Z5Gku0QtZgTis&callback=initMap"></script>
 
 
 
