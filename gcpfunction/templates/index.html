@@ -9,46 +9,58 @@
       type="text/css"
       href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css"
     />
-   
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <title>Apartment-Housing Rental</title>
   </head>
 <body >
 <div>
 <h1 style="text-align:center">Search for Apartments or Houses</h1>
 <div>
-  <form action="/" method = "post" >
+  <form action="/" method = "post" id="form1">
     <div class="form-row">
-      <div class="form-group col-md-3">
+      <div class="form-group col-md-4">
+        <label for="zip">Zip</label>
+        <input type="text" class="form-control zip" id="zip" placeholder="97201"  maxlength="5" name="zip"  required>
+        <div class="text-error"></div>
+      </div>
+      <div class="form-group col-md-4">
         <label for="city">City</label>
-        <input type="text" class="form-control city" id="city" placeholder="Portland" name="city" value= "Hillsboro" required>
+        <input type="text" class="form-control city" id="city" placeholder="Portland" name="city"  required>
       </div>
-      <div class="form-group col-md-3">
+      <div class="form-group col-md-4">
         <label for="state">State</label>
-        <input type="text" class="form-control state" id="state" placeholder="OR"  name="state" value= "OR" required>
+        <input type="text" class="form-control state" id="state" placeholder="OR"  name="state" maxlength="2" required>
       </div>
-      <div class="form-group col-md-3">
-        <label for="bed">Bedroom</label>
-        <input type="number" class="form-control bed" id="bed" min="1" max="99" value="1" name="bed" required>
-      </div>
-      <div class="form-group col-md-3">
-        <label for="bath">Bathroom</label>
-        <input type="number" class="form-control bath" id="bath" min="1" max="99"  value="1" name="bath" required>
-      </div>
+      
     </div>
 
     <div class="form-row">
       <div class="form-group col-md-6">
-        <label for="address">Address</label>
-        <input type="text" class="form-control addr" id="addr" placeholder="123 Main St, Conway, SC 29526"  name="addr">
+        <label for="addr">Address</label>
+        <input type="text" class="form-control addr" id="addr" placeholder="123 Main St"  name="addr">
         <small id="addrHelpBlock" class="form-text text-muted">
-          pass an optional address for looking up a specific property. The address should be formatted as street address, city, state zip
+          pass an optional address for looking up a specific property. The address should be formatted as street address
         </small>
       </div>
-      <div class="form-group col-md-6">
+      <div class="form-group col-md-2">
         <label for="radius">Radius</label>
-        <input type="number" class="form-control radius" id="radius" min="10" max="200"  name="radius">
+        <input type="number" class="form-control radius" id="radius" min="10" max="200"  step= "10" name="radius">
         <small id="radiusHelpBlock" class="form-text text-muted">
           filter listings within this specified number of kilometers. You must provide an address parameters when using a radius search
+        </small>
+      </div>
+      <div class="form-group col-md-2">
+        <label for="bed">Bedroom</label>
+        <input type="number" class="form-control bed" id="bed" min="1" max="99" name="bed" >
+        <small id="bedHelpBlock" class="form-text text-muted">
+          will get ignored if address is empty
+        </small>
+      </div>
+      <div class="form-group col-md-2">
+        <label for="bath">Bathroom</label>
+        <input type="number" class="form-control bath" id="bath" min="1" max="99" name="bath" >
+        <small id="bathHelpBlock" class="form-text text-muted">
+          will get ignored if address is empty
         </small>
       </div>
     </div>
@@ -65,8 +77,6 @@
   </form>
   
 </div>
-{{query}}
-{{data}}
 <div>
   <form action="/" method = "post" >
 
@@ -74,21 +84,93 @@
    <ol>
      
     {% for d in data %}
+    {% if d[''] %}
     <li>
       {{d}}
     </li>
     {% endfor %}
-
+    {% endif %}
    </ol>
    
   </form>
 
 </div>
 
-<script>
 
 
+<script type="text/javascript">
+// get city and state by zip
+	$(function() {
+    // IMPORTANT: Fill in your client key
+    
+		var clientKey = "js-IZ0pt4DP5uk3xRvsCQfK6DLZHf6T4h96d531QBqHilLOO6Frgjk3kcS3BDLNaUxO";
+		
+		var cache = {};
+		var container = $("#form1");
+		var errorDiv = container.find("div.text-error");
+		
+		/** Handle successful response */
+		function handleResp(data)
+		{
+			// Check for error
+			if (data.error_msg)
+				errorDiv.text(data.error_msg);
+			else if ("city" in data)
+			{
+				// Set city and state
+				container.find("input[name='city']").val(data.city);
+				container.find("input[name='state']").val(data.state);
+			}
+		}
+		
+		// Set up event handlers
+		container.find("input[name='zip']").on("keyup change", function() {
+			// Get zip code
+			var zip = $(this).val().substring(0, 5);
+			if (zip.length == 5 && /^[0-9]+$/.test(zip))
+			{
+				// Clear error
+				errorDiv.empty();
+				
+				// Check cache
+				if (zip in cache)
+				{
+					handleResp(cache[zip]);
+				}
+				else
+				{
+					// Build url
+					var url = "http://www.zipcodeapi.com/rest/"+clientKey+"/info.json/" + zip + "/radians";
+					
+					// Make AJAX request
+					$.ajax({
+						"url": url,
+						"dataType": "json"
+					}).done(function(data) {
+						handleResp(data);
+						
+						// Store in cache
+						cache[zip] = data;
+					}).fail(function(data) {
+						if (data.responseText && (json = $.parseJSON(data.responseText)))
+						{
+							// Store in cache
+							cache[zip] = json;
+							
+							// Check for error
+							if (json.error_msg)
+								errorDiv.text(json.error_msg);
+						}
+						else
+							errorDiv.text('Request failed.');
+					});
+				}
+			}
+		}).trigger("change");
+	});
 </script>
+
+
 
 
 
