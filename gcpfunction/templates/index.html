@@ -111,7 +111,7 @@
               <label class="item"  for="geo{{loop.index}}">
                 <b>{{d.propertyType}}: &nbsp; {{d.bathrooms}}baths &nbsp; {{d.bedrooms}}beds &nbsp; {{d.squareFootage}}sqft &nbsp; ${{d.price}} &nbsp; {{d.bedrooms}}beds &nbsp; {{d.daysOnMarket}}&nbsp; days on market </b>
                 <small> (Address: {{d.rawAddress}})</small>
-                <input class="check-item" type="checkbox" name="geodata" value="{{d}}" id = "geo{{loop.index}}">
+                <input class="check-item" type="checkbox" name="geodata" value="{{d.rawAddress}}" id = "geo{{loop.index}}">
               </label>
               </li>
              </div>
@@ -234,15 +234,15 @@
   let selectedlocations =[];
   let dests =[]
   let origins =[];
-
+  
+  var markersArray = [];
+  var destinationIcon = 'https://chart.googleapis.com/chart?' +
+            'chst=d_map_pin_letter&chld=D|FF0000|000000';
+  var originIcon = 'https://chart.googleapis.com/chart?' +
+            'chst=d_map_pin_letter&chld=O|FFFF00|000000';
   function initMap() {
 
-        var bounds = new google.maps.LatLngBounds;
-        var markersArray = [];
-        var destinationIcon = 'https://chart.googleapis.com/chart?' +
-            'chst=d_map_pin_letter&chld=D|FF0000|000000';
-        var originIcon = 'https://chart.googleapis.com/chart?' +
-            'chst=d_map_pin_letter&chld=O|FFFF00|000000';
+    var bounds = new google.maps.LatLngBounds;
 
         var map = new google.maps.Map(document.getElementById('map'), {
           zoom: 8,
@@ -254,12 +254,13 @@
 
         document.getElementById('mapbtn').addEventListener('click', function() {
           if (prepareData()){
-            console.log(origins);
+            //console.log(origins);
             console.log(dests);
-            console.log(selectedlocations);
+            //console.log(selectedlocations);
             var adds= [document.getElementById('addrm').value.trim()];
             //geocodeAddress(geocoder, map, adds, 0);
-            disMaxtrix(service, geocoder, adds, dests,  1)
+            console.log(adds);
+            disMaxtrix(service, geocoder, map, adds, dests, bounds, 1)
           }
           
         });
@@ -271,12 +272,13 @@
            origins =[];
           var valid = true;
           var checkedValue = document.querySelectorAll('.check-item:checked');
-          console.log(checkedValue)
+          //console.log(checkedValue)
         if (checkedValue.length >0 && checkedValue.length<9){
           for(var i=0; checkedValue[i]; ++i){
             var checkeddata = checkedValue[i].value;
             selectedlocations[i]= checkeddata
-            dests[i]={lat: checkeddata["latitude"], lng: checkeddata["longitude"]}
+            //dests[i]={lat: checkeddata["latitude"], lng: checkeddata["longitude"]}
+            dests[i]= checkeddata
             }
         }else{
             valid = false;
@@ -305,7 +307,7 @@
         markersArray = [];
       }
 
-      function disMaxtrix(service, geocoder, org, dests,  mode){
+      function disMaxtrix(service, geocoder, map,org, dests,  bounds,mode){
 
         service.getDistanceMatrix({
           origins: org,
