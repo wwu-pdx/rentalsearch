@@ -24,8 +24,8 @@ headers = {
     'x-rapidapi-key': "e22db4aecdmshd349a536e367dffp141a7djsn78c642d73125"
     }
 
-#conn.request("GET", "/rentalListings?address=Portland&state=OR", headers=headers)
-conn.request("GET", "/rentalListings?radius=50&bedrooms=2&bathrooms=1&address=1900%20SW%204th%20Ave%252C%20Portland%252C%20OR%2097201", headers=headers)
+conn.request("GET", "/rentalListings?radius=50&address=1900%20SW%204th%20Ave%252C%20Portland%252C%20OR%2097201", headers=headers)
+#conn.request("GET", "/rentalListings?radius=50&bedrooms=2&bathrooms=1&address=1900%20SW%204th%20Ave%252C%20Portland%252C%20OR%2097201", headers=headers)
 
 res = conn.getresponse()
 data = res.read().decode("utf-8")

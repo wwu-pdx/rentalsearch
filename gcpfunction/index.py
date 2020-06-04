@@ -46,10 +46,10 @@ class Index(MethodView):
 		query = f"/rentalListings?city={city}&state={state}"
 
 
-		if addr:
+		if addr and radius:
 			address = f'{addr}, {city}, {state} {zip}'
-			address = address.replace(",","%252C").replace(" ","%20")
-			query =query + f"&address={address}"
+			address = address.replace(",","%2C").replace(" ","%20")
+			query = f"/rentalListings?radius={radius}&address={address}"
 			if radius:
 				query = query+ f"&radius={radius}"
 				if bed:
@@ -60,9 +60,9 @@ class Index(MethodView):
 
 		
 
-		data = Search().search(query)
-			
-
+		d = Search().search(query)
+		data = sorted(d, key = lambda i: i['price']) 	
+      
 		
 		#return redirect(url_for('index', data = {"redic":"post"}))
 		return render_template('index.html', query=query, data=data)
