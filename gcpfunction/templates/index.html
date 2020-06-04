@@ -138,19 +138,19 @@
   </div>
 
     <!--google map-->
-    <div class="row" style="height:80vw" id ="map">
+    <div class="row">
+
+      <div class="col" style="height:40vw" id ="map">
      
+      </div>
+  
+      <div class="col" style="height:40vw;border:solid 1px black" id ="output">
+       
+      </div>
     </div>
     
+    
   </div>
-
-
-  
-
-
-
-
-
 
 
 
@@ -231,30 +231,146 @@
   });
   
 
-
+  let selectedlocations =[];
+  let dests =[]
+  let origins =[];
 
   function initMap() {
+
+        var bounds = new google.maps.LatLngBounds;
+        var markersArray = [];
+        var destinationIcon = 'https://chart.googleapis.com/chart?' +
+            'chst=d_map_pin_letter&chld=D|FF0000|000000';
+        var originIcon = 'https://chart.googleapis.com/chart?' +
+            'chst=d_map_pin_letter&chld=O|FFFF00|000000';
+
         var map = new google.maps.Map(document.getElementById('map'), {
           zoom: 8,
           center: {lat: 45.52345, lng: -122.67621}//
         });
       
        var geocoder = new google.maps.Geocoder();
-       
+       var service = new google.maps.DistanceMatrixService;
 
         document.getElementById('mapbtn').addEventListener('click', function() {
-          geocodeAddress(geocoder, map);
+          if (prepareData()){
+            console.log(origins);
+            console.log(dests);
+            console.log(selectedlocations);
+            var adds= [document.getElementById('addrm').value.trim()];
+            //geocodeAddress(geocoder, map, adds, 0);
+            disMaxtrix(service, geocoder, adds, dests,  1)
+          }
+          
         });
       }
+    
+      function prepareData(){
+           selectedlocations =[];
+           dests =[]
+           origins =[];
+          var valid = true;
+          var checkedValue = document.querySelectorAll('.check-item:checked');
+          console.log(checkedValue)
+        if (checkedValue.length >0 && checkedValue.length<9){
+          for(var i=0; checkedValue[i]; ++i){
+            var checkeddata = checkedValue[i].value;
+            selectedlocations[i]= checkeddata
+            dests[i]={lat: checkeddata["latitude"], lng: checkeddata["longitude"]}
+            }
+        }else{
+            valid = false;
+
+        }
+          var start = document.getElementById('addrm');
+          console.log(start.value)
+          if(start == null){
+            valid = false;
+          }else{
+            if(start.value.trim().length == 0 ){
+
+              valid = false;
+            }
+
+          }
+
+          return valid;
+          
+        }
       
-     function geocodeAddress(geocoder, resultsMap) {
+      function deleteMarkers(markersArray) {
+        for (var i = 0; i < markersArray.length; i++) {
+          markersArray[i].setMap(null);
+        }
+        markersArray = [];
+      }
+
+      function disMaxtrix(service, geocoder, org, dests,  mode){
+
+        service.getDistanceMatrix({
+          origins: org,
+          destinations: dests,
+          travelMode: 'DRIVING',
+          unitSystem: google.maps.UnitSystem.METRIC,
+          avoidHighways: false,
+          avoidTolls: false
+        }, function(response, status) {
+          if (status !== 'OK') {
+            alert('Error was: ' + status);
+          } else {
+            var originList = response.originAddresses;
+            var destinationList = response.destinationAddresses;
+            var outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = '';
+            deleteMarkers(markersArray);
+
+            var showGeocodedAddressOnMap = function(asDestination) {
+              var icon = asDestination ? destinationIcon : originIcon;
+              return function(results, status) {
+                if (status === 'OK') {
+                  map.fitBounds(bounds.extend(results[0].geometry.location));
+                  markersArray.push(new google.maps.Marker({
+                    map: map,
+                    position: results[0].geometry.location,
+                    icon: icon
+                  }));
+                } else {
+                  alert('Geocode was not successful due to: ' + status);
+                }
+              };
+            };
+
+            for (var i = 0; i < originList.length; i++) {
+              var results = response.rows[i].elements;
+              geocoder.geocode({'address': originList[i]},
+                  showGeocodedAddressOnMap(false));
+              for (var j = 0; j < results.length; j++) {
+                geocoder.geocode({'address': destinationList[j]},
+                    showGeocodedAddressOnMap(true));
+                outputDiv.innerHTML += originList[i] + ' to ' + destinationList[j] +
+                    ': ' + results[j].distance.text + ' in ' +
+                    results[j].duration.text + '<br>';
+              }
+            }
+          }
+        });
+
+
+
+
+      }
+
+      
+
+     function geocodeAddress(geocoder, resultsMap, adds, mode) {
         
-        var adds=["1100 Lloyd Center, Portland, OR 97232", "9700 SW Washington Square Rd, Tigard, OR 97223"]
-        //var adds={{adds|safe}}
+        //var adds=["1100 Lloyd Center, Portland, OR 97232", "9700 SW Washington Square Rd, Tigard, OR 97223"]
+       
         for (i = 0; i < adds.length; i++) {
         geocoder.geocode({'address': adds[i]}, function(results, status) {
           if (status === 'OK') {
             resultsMap.setCenter(results[0].geometry.location);
+            console.log(results[0])
             var marker = new google.maps.Marker({
               map: resultsMap,
               position: results[0].geometry.location
@@ -262,6 +378,10 @@
            //float window to show first return address from google map
            var infowindow = new google.maps.InfoWindow;
            infowindow.setContent(results[0].formatted_address);
+           if (mode=0){
+            origins[0] = results[0].formatted_address;
+           }
+           
            marker.addListener('click', function() {
             infowindow.open(map, marker);
            });
@@ -269,7 +389,13 @@
             alert('Geocode was not successful for the following reason: ' + status);
           }
         });
-    }
+      }
+
+
+
+
+
+
    }
 
 
