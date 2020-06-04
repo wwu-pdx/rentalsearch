@@ -1,4 +1,3 @@
-from collections import OrderedDict
 import http.client
 import json
 
@@ -26,8 +25,7 @@ class Search():
             res = conn.getresponse()
             response = res.read().decode("utf-8")
             data = json.loads(response)
-            print(type(data))
-            #data = [{"item1":1},{"item2":1}]
-                
+
+
         
             return data

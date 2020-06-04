@@ -1,15 +1,9 @@
 from flask import redirect, request, url_for, render_template
 from flask.views import MethodView
-
-from collections import OrderedDict
 import requests
 from search import Search
 
 class Index(MethodView):
-
-	# def get(self):
-	# 	print("get")
-	# 	return render_template('index.html')
 
 
 	def get(self):
@@ -34,6 +28,7 @@ class Index(MethodView):
 		bath = request.form['bath']
 		addr =  request.form['addr']
 		radius =  request.form['radius']
+		orderby = request.form['orderby']
 		#limit=10
 		#offset =1
 
@@ -61,8 +56,14 @@ class Index(MethodView):
 		
 
 		d = Search().search(query)
-		data = sorted(d, key = lambda i: i['price']) 	
-      
+		if orderby=="1":
+			data = sorted(d, key = lambda i: i['price']) 	
+		elif orderby=="2":
+			data = sorted(d, key = lambda i: i['price'],reverse=True)
+		elif orderby=="3":
+			data = sorted(d, key = lambda i: i['squareFootage']) 
+		else:
+			data = sorted(d, key = lambda i: i['squareFootage'],reverse=True)
 		
 		#return redirect(url_for('index', data = {"redic":"post"}))
 		return render_template('index.html', query=query, data=data)

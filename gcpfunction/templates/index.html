@@ -18,20 +18,29 @@
 <div>
   <form action="/" method = "post" id="form1">
     <div class="form-row">
-      <div class="form-group col-md-4">
+      <div class="form-group col-md-3">
         <label for="zip">Zip</label>
         <input type="text" class="form-control zip" id="zip" placeholder="97201"  maxlength="5" name="zip"  required>
         <div class="text-error"></div>
       </div>
-      <div class="form-group col-md-4">
+      <div class="form-group col-md-3">
         <label for="city">City</label>
         <input type="text" class="form-control city" id="city" placeholder="Portland" name="city"  required>
       </div>
-      <div class="form-group col-md-4">
+      <div class="form-group col-md-3">
         <label for="state">State</label>
         <input type="text" class="form-control state" id="state" placeholder="OR"  name="state" maxlength="2" required>
       </div>
-      
+      <div class="form-group col-md-3">
+        <label for="orderby">Order by</label>
+        <select class="custom-select orderby"  id="orderby"  name="orderby">
+          <option value="1" selected>Price asc</option>
+          <option value="2">Priice desc</option>
+          <option value="3">Sqft asc</option>
+          <option value="4">Sqft desc</option>
+        </select>
+      </div>
+       
     </div>
 
     <div class="form-row">
@@ -39,28 +48,28 @@
         <label for="addr">Address</label>
         <input type="text" class="form-control addr" id="addr" placeholder="123 Main St"  name="addr">
         <small id="addrHelpBlock" class="form-text text-muted">
-          pass an optional address for looking up a specific property. The address should be formatted as street address;will get ignored if radius is empty
+          Pass an optional address for looking up a specific property. The address should be formatted as street address; Will get ignored if radius is empty
         </small>
       </div>
       <div class="form-group col-md-2">
         <label for="radius">Radius</label>
         <input type="number" class="form-control radius" id="radius" min="10" max="200"  step= "10" name="radius">
         <small id="radiusHelpBlock" class="form-text text-muted">
-          filter listings within this specified number of kilometers. You must provide an address parameters when using a radius search; will get ignored if address is empty
+          Filter listings within this specified number of kilometers. You must provide an address parameters when using a radius search; Will get ignored if address is empty
         </small>
       </div>
       <div class="form-group col-md-2">
         <label for="bed">Bedroom</label>
         <input type="number" class="form-control bed" id="bed" min="1" max="99" name="bed" >
         <small id="bedHelpBlock" class="form-text text-muted">
-          will get ignored if address or radius is empty
+          Will get ignored if address or radius is empty
         </small>
       </div>
       <div class="form-group col-md-2">
         <label for="bath">Bathroom</label>
         <input type="number" class="form-control bath" id="bath" min="1" max="99" name="bath" >
         <small id="bathHelpBlock" class="form-text text-muted">
-          will get ignored if address or radius is empty
+          Will get ignored if address or radius is empty
         </small>
       </div>
     </div>
@@ -91,7 +100,7 @@
       &nbsp; ${{d.price}} &nbsp; {{d.bedrooms}}beds &nbsp; {{d.daysOnMarket}}&nbsp; days on market 
       </div>
       <div>
-        Address {{d.rawAddress}}
+        Address: {{d.rawAddress}}
       </div>
       
     </li>
