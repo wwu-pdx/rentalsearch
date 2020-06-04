@@ -28,7 +28,7 @@ class Index(MethodView):
 		bath = request.form['bath']
 		addr =  request.form['addr']
 		radius =  request.form['radius']
-		orderby = request.form['orderby']
+		odby = request.form['odby']
 		#limit=10
 		#offset =1
 
@@ -56,11 +56,11 @@ class Index(MethodView):
 		
 
 		d = Search().search(query)
-		if orderby=="1":
+		if odby=="1":
 			data = sorted(d, key = lambda i: i['price']) 	
-		elif orderby=="2":
+		elif odby=="2":
 			data = sorted(d, key = lambda i: i['price'],reverse=True)
-		elif orderby=="3":
+		elif odby=="3":
 			data = sorted(d, key = lambda i: i['squareFootage']) 
 		else:
 			data = sorted(d, key = lambda i: i['squareFootage'],reverse=True)

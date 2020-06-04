@@ -32,10 +32,10 @@
         <input type="text" class="form-control state" id="state" placeholder="OR"  name="state" maxlength="2" required>
       </div>
       <div class="form-group col-md-3">
-        <label for="orderby">Order by</label>
-        <select class="custom-select orderby"  id="orderby"  name="orderby">
+        <label for="odby">Order by</label>
+        <select  class="custom-select odby"  id="orderby"  name="odby">
           <option value="1" selected>Price asc</option>
-          <option value="2">Priice desc</option>
+          <option value="2">Price desc</option>
           <option value="3">Sqft asc</option>
           <option value="4">Sqft desc</option>
         </select>
@@ -45,7 +45,7 @@
 
     <div class="form-row">
       <div class="form-group col-md-6">
-        <label for="addr">Address</label>
+        <label for="addr">Street Address</label>
         <input type="text" class="form-control addr" id="addr" placeholder="123 Main St"  name="addr">
         <small id="addrHelpBlock" class="form-text text-muted">
           Pass an optional address for looking up a specific property. The address should be formatted as street address; Will get ignored if radius is empty
@@ -76,7 +76,7 @@
 
     <div class="form-row">
       <div class="form-group col-md-6">
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-info">Search</button>
       </div>
       <div class="form-group col-md-6">
         <button type="reset" class="btn btn-secondary">Reset</button>
@@ -86,36 +86,75 @@
   </form>
   
 </div>
-<div>
-  <form action="/" method = "post" >
 
-    
+<div class=container>
+
+  <!--search result-->
+  
+
+    <!--result titile-->
+    <div class="row">
+      <h2>Search Results</h2>
+    </div>
+
+    <!--result list-->
    <ol>
-     
-    {% for d in data %}
-    {% if d.status=='Active' %}
-    <li>
-      <div>
-       {{d.propertyType}} :  &nbsp; {{d.bathrooms}}baths &nbsp; {{d.bedrooms}}beds &nbsp; {{d.squareFootage}}sqft 
-      &nbsp; ${{d.price}} &nbsp; {{d.bedrooms}}beds &nbsp; {{d.daysOnMarket}}&nbsp; days on market 
-      </div>
-      <div>
-        Address: {{d.rawAddress}}
-      </div>
-      
-    </li>
-    {% endif %}
-    {% endfor %}
-    
-   </ol>
+      {% for d in data %}
+      {% if d.status=='Active' %}      
+        
+          
+            <div class="row">
+              <li>          
+              <label class="item"  for="geo{{loop.index}}">
+                <b>{{d.propertyType}}: &nbsp; {{d.bathrooms}}baths &nbsp; {{d.bedrooms}}beds &nbsp; {{d.squareFootage}}sqft &nbsp; ${{d.price}} &nbsp; {{d.bedrooms}}beds &nbsp; {{d.daysOnMarket}}&nbsp; days on market </b>
+                <small> (Address: {{d.rawAddress}})</small>
+                <input class="check-item" type="checkbox" name="geodata" value="la" id = "geo{{loop.index}}">
+              </label>
+              </li>
+             </div>
+         
+        
+      {% endif %}
+      {% endfor %}
+    </ol>
+  </div>
+  </div>
+
+  <!--map-->
+<div class=container>
+  <div class="row-1">
+
+    <!--map input-->
    
-  </form>
+  
+        <label for="addrm">Starting Address:
+        <input type="text" class="addrm" id="addrm" placeholder="123 Main St"  name="addrm"> 
+     
+        <button type="submit" class="btn btn-primary btnm">Add Start and Destinations</button>
+ 
+    </div>
+
+    <!--google map-->
+    <div class="row-11">
+      <div sytle="height:200px; border:solid 1px black">
+
+      </div>
+    </div>
+  </div>
 
 </div>
 
 
 
+
+
+
+
+
 <script type="text/javascript">
+
+
+//zipcode API
 // get city and state by zip
 	$(function() {
     // IMPORTANT: Fill in your client key
@@ -184,7 +223,14 @@
 				}
 			}
 		}).trigger("change");
-	});
+  });
+  
+
+
+
+
+
+
 </script>
 
 
