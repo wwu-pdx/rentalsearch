@@ -246,7 +246,7 @@
       
      function geocodeAddress(geocoder, resultsMap) {
         
-        //var adds=["1100 Lloyd Center, Portland, OR 97232", "9700 SW Washington Square Rd, Tigard, OR 97223"]
+        var adds=["1100 Lloyd Center, Portland, OR 97232", "9700 SW Washington Square Rd, Tigard, OR 97223"]
         //var adds={{adds|safe}}
         for (i = 0; i < adds.length; i++) {
         geocoder.geocode({'address': adds[i]}, function(results, status) {
