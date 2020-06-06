@@ -134,18 +134,27 @@
         <input type="text" class="addrm" id="addrm"  value ="1900 SW 4th AVE, Portland OR"  name="addrm"> 
      
         <button type="submit" class="btn btn-primary btnm" id ="mapbtn">Add Start and Destinations</button>
-        <input type="text" class="hidden" id="addhidden"  value =""  name="addhidden"> 
-        <span id="errmap"></span>
+        
+       
+        
   </div>
-
+   <!--map error-->
+   <div class="row"><span id="errmap"></span></div>
     <!--google map-->
     <div class="row">
-
+<!-- 
       <div class="col" style="height:40vw" id ="map">
      
-      </div>
+      </div> -->
   
-      <div class="col" style="height:40vw;border:solid 1px black" id ="output">
+      <div class="col" style="height:40vw;border:solid 1px black" >
+       <ul id ="output">
+
+
+       </ul>
+        
+       <h3 id=url></h3>
+       <h3><a id="urla"  target="_blank">Show Routes</a></h3>
        
       </div>
     </div>
@@ -242,17 +251,17 @@
   function initMap() {
 
     var bounds = new google.maps.LatLngBounds;
-    var directionsService = new google.maps.DirectionsService();
-    var directionsRenderer = new google.maps.DirectionsRenderer();
+   // var directionsService = new google.maps.DirectionsService();
+   // var directionsRenderer = new google.maps.DirectionsRenderer();
 
-        var map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 8,
-          center: {lat: 45.52345, lng: -122.67621}//
-        });
+        // var map = new google.maps.Map(document.getElementById('map'), {
+        //   zoom: 8,
+        //   center: {lat: 45.52345, lng: -122.67621}//
+        // });
       
        var geocoder = new google.maps.Geocoder();
        var service = new google.maps.DistanceMatrixService;
-       directionsRenderer.setMap(map);
+      // directionsRenderer.setMap(map);
 
         document.getElementById('mapbtn').addEventListener('click', function() {
           if (prepareData()){
@@ -261,16 +270,10 @@
            
             var adds= [document.getElementById('addrm').value.trim()];
            
-            //getGeocoder(adds,geocoder,service, geocoder, map, origins, dests, sortdests, bounds,directionsService, directionsRenderer)
-            //console.log(origins.length)
-
-            // if (origins.length>0){
-
-              disMaxtrix(service, geocoder, map, adds, dests, sortdests, bounds, directionsService, directionsRenderer)
-              //calculateAndDisplayRoute(directionsService, directionsRenderer,sortdests,origins)
-              //console.log(dests);
-              //console.log(origins);
-            // }
+           
+              disMaxtrix(service,  adds, dests, bounds)
+              
+              
            
 
           }
@@ -332,7 +335,7 @@
       
 
       //https://developers.google.com/maps/documentation/javascript/examples/distance-matrix
-      function disMaxtrix( service, geocoder, map, origins, dests, sortdests, bounds,directionsService, directionsRenderer){
+      function disMaxtrix( service,  origins, dests, bounds){
 
        
        // console.log(dests);
@@ -355,35 +358,31 @@
             deleteMarkers(markersArray);
            
 
-            var showGeocodedAddressOnMap = function(asDestination,j) {
-              var destinationIcon = 'https://chart.googleapis.com/chart?' +
-            'chst=d_map_pin_letter&chld='+j+'|FF0000|000000';
-              var originIcon = 'https://chart.googleapis.com/chart?' +
-            'chst=d_map_pin_letter&chld=O|FFFF00|000000';
-              var icon = asDestination ? destinationIcon : originIcon;
-              return function(results, status) {
-                if (status === 'OK') {
-                  map.fitBounds(bounds.extend(results[0].geometry.location));
-                  markersArray.push(new google.maps.Marker({
-                    map: map,
-                    position: results[0].geometry.location,
-                    icon: icon
-                  }));
+            // var showGeocodedAddressOnMap = function(asDestination,j) {
+            //   var destinationIcon = 'https://chart.googleapis.com/chart?' +
+            //  'chst=d_map_pin_letter&chld='+j+'|FF0000|000000';
+            //   var originIcon = 'https://chart.googleapis.com/chart?' +
+            //  'chst=d_map_pin_letter&chld=O|FFFF00|000000';
+            //   var icon = asDestination ? destinationIcon : originIcon;
+            //   return function(results, status) {
+            //     if (status === 'OK') {
+            //       map.fitBounds(bounds.extend(results[0].geometry.location));
+            //       // markersArray.push(new google.maps.Marker({
+            //       //   map: map,
+            //       //   position: results[0].geometry.location,
+            //       //   icon: icon
+            //       // }));
+
+            //     } else {
+            //       alert('Geocode was not successful due to: ' + status);
+            //     }
+            //   };
+            // };
 
 
-
-                  
-
-
-
-                } else {
-                  alert('Geocode was not successful due to: ' + status);
-                }
-              };
-            };
 
             //sort based on distances
-            var result = response.rows[0].elements;
+            let result = response.rows[0].elements;
                   for(var i = 0; i < destinationList.length; i++){
                     let add=[destinationList[i], parseFloat(result[i].distance.text)];
                     sortdests.push(add);
@@ -392,36 +391,39 @@
                   sortdests.sort(function(first, second) {
                         return first[1] - second[1];
                         });
-                // console.log(sortdests) 
+                
+          let waypts = "";
+          for (var i = 0; i < sortdests.length-1; i++) {
           
-            //   var waypts = [];
-            //   for (var i = 0; i < sortdests.length-1; i++) {
-              
-            //       waypts.push({
-            //         location: sortdests[i][0],
-            //         stopover: true
-            //       });
-              
-            //   }
-            //  console.log(waypts)
-            
-            
+             waypts+=sortdests[i][0]+"|";
+          }
+
+          waypts = waypts.slice(0, -1); 
+
+          let last = sortdests[sortdests.length-1][0];
+
 
             
             for (var i = 0; i < originList.length; i++) {
               var results = response.rows[i].elements;
-              geocoder.geocode({'address': originList[i]},
-                 showGeocodedAddressOnMap(false, 0));
-                 outputDiv.innerHTML += originList[i]
+              
+              outputDiv.innerHTML += "<li>Starting: <b id='start'>"+originList[i]+ "</b></li>"
               for (var j = 0; j < sortdests.length; j++) {
-                geocoder.geocode({'address': destinationList[j]},
-                showGeocodedAddressOnMap(true,j)
-                   );
-                   outputDiv.innerHTML += originList[i] + ' to ' + sortdests[j][0] +
-                    ': ' + sortdests[j][1]  +'<br>';
-                    console.log(destinationList[j])
+              
+                   outputDiv.innerHTML += "<li>Destinations"+j+": <b class='dests'>"+sortdests[j][0]+ "</b> ( " + sortdests[j][1]  +" km)</li>";
+                   
 
               }
+              let origin=originList[i]
+
+              let url = "https://www.google.com/maps/dir/?api=1&origin="+origin+"&destination="+last+"&waypoints="+waypts+"&travelmode=driving";
+              url.replace(' ',"+").replace(',','%2C').replace('|','%7C');
+              console.log(url);
+              
+              
+              let urlh3= document.getElementById('urla');
+              urlh3.href = url;
+
             }
          }
         });
@@ -432,48 +434,79 @@
       }
 
       //https://developers.google.com/maps/documentation/javascript/examples/directions-waypoints
-      // function calculateAndDisplayRoute(directionsService, directionsRenderer,sortdests,origins) {
-      //   var waypts = [];
-      //   for (var i = 0; i < sortdests.length-1; i++) {
-         
-      //       waypts.push({
-      //         location: sortdests[i][1],
-      //         stopover: true
-      //       });
-        
-      //   }
-
-      //   console.log(origins);
-      //   console.log(dests);
-
-      //   directionsService.route({
-      //     origin: origins[0],
-      //     destination: sortdests[-1][1],
-      //     waypoints: waypts,
-      //     optimizeWaypoints: true,
-      //     travelMode: 'DRIVING'
-      //   }, function(response, status) {
-      //     if (status === 'OK') {
-      //       directionsRenderer.setDirections(response);
-      //       var route = response.routes[0];
-      //       var summaryPanel = document.getElementById('output');
-      //       summaryPanel.innerHTML = '';
-      //       // For each route, display summary information.
-      //       for (var i = 0; i < route.legs.length; i++) {
-      //         var routeSegment = i + 1;
-      //         summaryPanel.innerHTML += '<b>Route Segment: ' + routeSegment +
-      //             '</b><br>';
-      //         summaryPanel.innerHTML += route.legs[i].start_address + ' to ';
-      //         summaryPanel.innerHTML += route.legs[i].end_address + '<br>';
-      //         summaryPanel.innerHTML += route.legs[i].distance.text + '<br><br>';
-      //       }
-      //     } else {
-      //       window.alert('Directions request failed due to ' + status);
-      //     }
-      //   });
-      // }
       
+      
+      function initMap2() {
+        var directionsService = new google.maps.DirectionsService;
+        var directionsRenderer = new google.maps.DirectionsRenderer;
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 6,
+          center: {lat: 45.52345, lng: -122.67621}//
+        });
+        directionsRenderer.setMap(map);
+        console.log("here");
+        document.getElementById('rtbtn').addEventListener('click', function() {
 
+              var start = document.getElementById('start');
+              var alldests = document.querySelectorAll('.dests');
+              console.log("clicked");
+              console.log(start.textContent)
+              if(start.length >0 && alldests.length>0){
+                let o = [start.textContent]
+                console.log(o)
+                
+                calculateAndDisplayRoute(directionsService, directionsRenderer);
+
+              }else
+              {
+                document.getElementById('errmap').innerHTML = "No start or destinations for routes";
+
+              }
+          
+        });
+      }
+
+      function calculateAndDisplayRoute(directionsService, directionsRenderer,sortdests,origins) {
+        var waypts = [];
+        for (var i = 0; i < sortdests.length-1; i++) {
+         
+            waypts.push({
+              location: sortdests[i].textContent,
+              stopover: true
+            });
+        
+        }
+
+        console.log(origins);
+        console.log(waypts);
+        console.log(sortdests[sortdests.length-1].textContent);
+
+        directionsService.route({
+          origin: origins[0],
+          destination: sortdests[sortdests.length-1].textContent,
+          waypoints: waypts,
+          optimizeWaypoints: true,
+          travelMode: 'DRIVING'
+        }, function(response, status) {
+          if (status === 'OK') {
+            directionsRenderer.setDirections(response);
+            var route = response.routes[0];
+            var summaryPanel = document.getElementById('directions-panel');
+            summaryPanel.innerHTML = '';
+            // For each route, display summary information.
+            for (var i = 0; i < route.legs.length; i++) {
+              var routeSegment = i + 1;
+              summaryPanel.innerHTML += '<b>Route Segment: ' + routeSegment +
+                  '</b><br>';
+              summaryPanel.innerHTML += route.legs[i].start_address + ' to ';
+              summaryPanel.innerHTML += route.legs[i].end_address + '<br>';
+              summaryPanel.innerHTML += route.legs[i].distance.text + '<br><br>';
+            }
+          } else {
+            window.alert('Directions request failed due to ' + status);
+          }
+        });
+      }
 
 
 
