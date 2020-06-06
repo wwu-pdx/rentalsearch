@@ -1,15 +1,29 @@
-# rentalsearch
+# Project Two - RentalSearch
 
 
-APIs
+## APIs
+* https://www.realtymole.com/api
+* https://www.zipcodeapi.com
+* Google Map APIs 
+** JS MAP API
+** directionMatrix
+** Geocoder API
+** direction API
+## Backend
+* Google Cloud App Engine
+* Python 
+## Frontend
+* js 
+* Jquery
+* Bootstrap
+* css
 
-https://www.realtymole.com/api
-https://www.zipcodeapi.com/
-Google Map APIs
-Google Cloud App Engine
 
-python 
-javasccript 
-jquery
-bootstrap
+## Tutorial and Code References
+* https://developers.google.com/maps/documentation/javascript/examples/distance-matrix
+* https://developers.google.com/maps/documentation/javascript/examples/directions-waypoints
+* https://www.zipcodeapi.com/Examples
+
+
+
 
