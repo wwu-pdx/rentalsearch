@@ -49,7 +49,7 @@
     <div class="form-row">
       <div class="form-group col-md-6">
         <label for="addr">Street Address</label>
-        <input type="text" class="form-control addr" id="addr" placeholder="123 Main St"  name="addr">
+        <input type="text" class="form-control addr" id="addr" placeholder="1900 SW 4th AVE" name="addr">
         <small id="addrHelpBlock" class="form-text text-muted">
           Pass an optional address for looking up a specific property. The address should be formatted as street address; Will get ignored if radius is empty
         </small>
@@ -111,7 +111,7 @@
               <label class="item"  for="geo{{loop.index}}">
                 <b>{{d.propertyType}}: &nbsp; {{d.bathrooms}}baths &nbsp; {{d.bedrooms}}beds &nbsp; {{d.squareFootage}}sqft &nbsp; ${{d.price}} &nbsp; {{d.bedrooms}}beds &nbsp; {{d.daysOnMarket}}&nbsp; days on market </b>
                 <small> (Address: {{d.rawAddress}})</small>
-                <input class="check-item" type="checkbox" name="geodata" value="{{d.rawAddress}}" id = "geo{{loop.index}}">
+                <input class="check-item" type="checkbox" name="geodata" value="{{d}}" id = "geo{{loop.index}}">
               </label>
               </li>
              </div>
@@ -131,10 +131,10 @@
    
   
         <label for="addrm">Starting Address:
-        <input type="text" class="addrm" id="addrm" placeholder="123 Main St"  name="addrm"> 
+        <input type="text" class="addrm" id="addrm"  value ="1900 SW 4th AVE, Portland OR"  name="addrm"> 
      
         <button type="submit" class="btn btn-primary btnm" id ="mapbtn">Add Start and Destinations</button>
- 
+        <span id="errmap"></span>
   </div>
 
     <!--google map-->
@@ -232,17 +232,17 @@
   
 
   let selectedlocations =[];
-  let dests =[]
+  let dests =[];
   let origins =[];
+  let sortdests =[];
   
   var markersArray = [];
-  var destinationIcon = 'https://chart.googleapis.com/chart?' +
-            'chst=d_map_pin_letter&chld=D|FF0000|000000';
-  var originIcon = 'https://chart.googleapis.com/chart?' +
-            'chst=d_map_pin_letter&chld=O|FFFF00|000000';
+  
   function initMap() {
 
     var bounds = new google.maps.LatLngBounds;
+    var directionsService = new google.maps.DirectionsService();
+    var directionsRenderer = new google.maps.DirectionsRenderer();
 
         var map = new google.maps.Map(document.getElementById('map'), {
           zoom: 8,
@@ -260,7 +260,7 @@
             var adds= [document.getElementById('addrm').value.trim()];
             //geocodeAddress(geocoder, map, adds, 0);
             console.log(adds);
-            disMaxtrix(service, geocoder, map, adds, dests, bounds, 1)
+            disMaxtrix(service, geocoder, map, adds, dests, sortdests, bounds, 1)
           }
           
         });
@@ -270,18 +270,22 @@
            selectedlocations =[];
            dests =[]
            origins =[];
+           sortdest =[];
           var valid = true;
           var checkedValue = document.querySelectorAll('.check-item:checked');
+          var errmap = document.getElementById('errmap');
+          errmap.innerHTML = "";
+        
           //console.log(checkedValue)
         if (checkedValue.length >0 && checkedValue.length<9){
           for(var i=0; checkedValue[i]; ++i){
-            var checkeddata = checkedValue[i].value;
-            selectedlocations[i]= checkeddata
-            //dests[i]={lat: checkeddata["latitude"], lng: checkeddata["longitude"]}
-            dests[i]= checkeddata
+            var checkeddata = JSON.parse(checkedValue[i].value.replace(/'/g, '"').replace('None', 'null'));
+            selectedlocations[i]= checkeddata;
+            dests[i]= checkeddata.rawAddress;
             }
         }else{
             valid = false;
+            
 
         }
           var start = document.getElementById('addrm');
@@ -296,6 +300,11 @@
 
           }
 
+          if (!valid){
+           
+            errmap.innerHTML = "Please make sure you added one start and 1-8 destinations"
+
+          }
           return valid;
           
         }
@@ -307,7 +316,8 @@
         markersArray = [];
       }
 
-      function disMaxtrix(service, geocoder, map,org, dests,  bounds,mode){
+      //https://developers.google.com/maps/documentation/javascript/examples/distance-matrix
+      function disMaxtrix(service, geocoder, map,org, dests, sortdests, bounds){
 
         service.getDistanceMatrix({
           origins: org,
@@ -326,7 +336,19 @@
             outputDiv.innerHTML = '';
             deleteMarkers(markersArray);
 
-            var showGeocodedAddressOnMap = function(asDestination) {
+            for(var i = 0; i < destinationList.length; i++){
+              
+
+            }
+            
+
+
+
+            var showGeocodedAddressOnMap = function(asDestination,j) {
+              var destinationIcon = 'https://chart.googleapis.com/chart?' +
+            'chst=d_map_pin_letter&chld='+j+'|FF0000|000000';
+              var originIcon = 'https://chart.googleapis.com/chart?' +
+            'chst=d_map_pin_letter&chld=O|FFFF00|000000';
               var icon = asDestination ? destinationIcon : originIcon;
               return function(results, status) {
                 if (status === 'OK') {
@@ -345,10 +367,10 @@
             for (var i = 0; i < originList.length; i++) {
               var results = response.rows[i].elements;
               geocoder.geocode({'address': originList[i]},
-                  showGeocodedAddressOnMap(false));
+                  showGeocodedAddressOnMap(false, 0));
               for (var j = 0; j < results.length; j++) {
                 geocoder.geocode({'address': destinationList[j]},
-                    showGeocodedAddressOnMap(true));
+                    showGeocodedAddressOnMap(true, j));
                 outputDiv.innerHTML += originList[i] + ' to ' + destinationList[j] +
                     ': ' + results[j].distance.text + ' in ' +
                     results[j].duration.text + '<br>';
@@ -362,36 +384,53 @@
 
       }
 
+      //https://developers.google.com/maps/documentation/javascript/examples/directions-simple
+      function calculateAndDisplayRoute(directionsService, directionsRenderer, start, end) {
+        directionsService.route(
+            {
+              origin: {query: start},
+              destination: {query: end},
+              travelMode: 'DRIVING'
+            },
+            function(response, status) {
+              if (status === 'OK') {
+                directionsRenderer.setDirections(response);
+              } else {
+                window.alert('Directions request failed due to ' + status);
+              }
+            });
+      }
+
       
 
-     function geocodeAddress(geocoder, resultsMap, adds, mode) {
+    //  function geocodeAddress(geocoder, resultsMap, adds, mode) {
         
-        //var adds=["1100 Lloyd Center, Portland, OR 97232", "9700 SW Washington Square Rd, Tigard, OR 97223"]
+    //     //var adds=["1100 Lloyd Center, Portland, OR 97232", "9700 SW Washington Square Rd, Tigard, OR 97223"]
        
-        for (i = 0; i < adds.length; i++) {
-        geocoder.geocode({'address': adds[i]}, function(results, status) {
-          if (status === 'OK') {
-            resultsMap.setCenter(results[0].geometry.location);
-            console.log(results[0])
-            var marker = new google.maps.Marker({
-              map: resultsMap,
-              position: results[0].geometry.location
-            });
-           //float window to show first return address from google map
-           var infowindow = new google.maps.InfoWindow;
-           infowindow.setContent(results[0].formatted_address);
-           if (mode=0){
-            origins[0] = results[0].formatted_address;
-           }
+    //     for (i = 0; i < adds.length; i++) {
+    //     geocoder.geocode({'address': adds[i]}, function(results, status) {
+    //       if (status === 'OK') {
+    //         resultsMap.setCenter(results[0].geometry.location);
+    //         console.log(results[0])
+    //         var marker = new google.maps.Marker({
+    //           map: resultsMap,
+    //           position: results[0].geometry.location
+    //         });
+    //        //float window to show first return address from google map
+    //        var infowindow = new google.maps.InfoWindow;
+    //        infowindow.setContent(results[0].formatted_address);
+    //        if (mode=0){
+    //         origins[0] = results[0].formatted_address;
+    //        }
            
-           marker.addListener('click', function() {
-            infowindow.open(map, marker);
-           });
-          } else {
-            alert('Geocode was not successful for the following reason: ' + status);
-          }
-        });
-      }
+    //        marker.addListener('click', function() {
+    //         infowindow.open(map, marker);
+    //        });
+    //       } else {
+    //         alert('Geocode was not successful for the following reason: ' + status);
+    //       }
+    //     });
+    //   }
 
 
 
