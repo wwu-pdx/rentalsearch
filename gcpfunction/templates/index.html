@@ -369,6 +369,13 @@
                     position: results[0].geometry.location,
                     icon: icon
                   }));
+
+
+
+                  
+
+
+
                 } else {
                   alert('Geocode was not successful due to: ' + status);
                 }
@@ -405,12 +412,13 @@
               var results = response.rows[i].elements;
               geocoder.geocode({'address': originList[i]},
                  showGeocodedAddressOnMap(false, 0));
+                 outputDiv.innerHTML += originList[i]
               for (var j = 0; j < sortdests.length; j++) {
                 geocoder.geocode({'address': destinationList[j]},
                 showGeocodedAddressOnMap(true,j)
                    );
-                   outputDiv.innerHTML += originList[i] + ' to ' + sortdests[j] +
-                    ': ' + results[j].distance.text + ' in ' +'<br>';
+                   outputDiv.innerHTML += originList[i] + ' to ' + sortdests[j][0] +
+                    ': ' + sortdests[j][1]  +'<br>';
                     console.log(destinationList[j])
 
               }
