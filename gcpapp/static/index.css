@@ -1,0 +1,173 @@
+* {
+  box-sizing: border-box;
+  
+  font-size: 1.1vw;
+
+  margin:auto;
+  padding: auto;  
+  text-align: center;  
+ 
+  width: 100%;
+
+
+}
+body{
+  background-color: rgb(255, 255, 255);
+
+}
+
+.form-control::-webkit-input-placeholder { color: rgb(132, 152, 218); }  /* WebKit, Blink, Edge */
+.form-control:-moz-placeholder { color: rgb(132, 152, 218); }  /* Mozilla Firefox 4 to 18 */
+.form-control::-moz-placeholder { color: rgb(132, 152, 218); }  /* Mozilla Firefox 19+ */
+.form-control:-ms-input-placeholder { color: rgb(132, 152, 218); }  /* Internet Explorer 10-11 */
+.form-control::-ms-input-placeholder { color: rgb(132, 152, 218); }  /* Microsoft Edge */
+
+
+
+h1,h2{
+  text-align:center;
+  font-family:  "Lucida Bright", Georgia, serif;
+}
+label{
+  text-align: left;
+  font-weight: bold;
+}
+small{
+  text-align: left;
+  font-size: 0.7vw;
+}
+
+li {
+  text-align: left;  
+
+}
+li:nth-child(odd) { 
+  
+  background-image: linear-gradient(to top,white,rgb(241, 248, 246),white);
+
+} 
+
+div.lirow:nth-child(odd) { 
+  
+  background-image: linear-gradient(to top,white,rgb(235, 254, 255),white);
+
+} 
+
+.flex-h{
+  
+ 
+  text-align: center;
+  font-size: 0.9vw;
+ 
+  width: 15%;
+  margin:0;
+  padding: 0;  
+  
+}
+input.flex-h{
+  width: 60%;
+  margin-right: 1%;
+
+}
+
+
+
+.flex-container-h .row{
+
+      text-align: center;
+}
+
+.flex-container-h{
+  display: flex;
+  align-items:space-evenly;
+  justify-content: space-evenly;
+ 
+  align-content: space-between;
+  
+
+  
+}
+
+.search{
+ 
+  box-shadow: 0 4px 8px 0 black, 0 3px 10px 0 rgb(12, 128, 148);
+  width: 98%;
+  background-image: linear-gradient(to right, rgb(252, 250, 251),white,rgb(252, 250, 251),white,rgb(252, 250, 251),white,rgb(252, 250, 251));
+
+  border-radius: 0.2vw;
+  padding: 1%;
+
+
+}
+
+.searcform{
+
+  text-align:center;
+  vertical-align: text-top;
+
+}
+.form-row{
+  vertical-align: text-top;
+}
+
+.form-group{
+   text-align:left;
+   vertical-align: text-top;
+}
+
+.results{
+  box-shadow: 0 4px 8px 0 black, 0 3px 10px 0 rgb(12, 128, 148);
+  border-radius: 0.2vw;
+  
+  text-align:center;
+  background-image: linear-gradient(to right, rgb(252, 250, 251),white,rgb(252, 250, 251),white,rgb(252, 250, 251),white,rgb(252, 250, 251));
+
+  width: 98%;
+  
+  padding: 1%;
+  
+
+}
+
+.err{
+  color:rgb(243, 70, 7);
+
+}
+
+
+
+
+.ih{
+  
+ 
+text-align: center;
+font-size: 0.9vw;
+
+width: 45%;
+margin:0;
+padding: 0;  
+
+}
+input.ih{
+width: 5%;
+
+
+}
+
+
+
+.container-h .row{
+
+    text-align: left;
+}
+
+.container-h{
+display: flex;
+align-items:space-evenly;
+justify-content: space-evenly;
+
+align-content: space-between;
+
+
+
+}
