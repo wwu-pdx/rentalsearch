@@ -134,6 +134,7 @@
         <input type="text" class="addrm" id="addrm"  value ="1900 SW 4th AVE, Portland OR"  name="addrm"> 
      
         <button type="submit" class="btn btn-primary btnm" id ="mapbtn">Add Start and Destinations</button>
+        <input type="text" class="hidden" id="addhidden"  value =""  name="addhidden"> 
         <span id="errmap"></span>
   </div>
 
@@ -236,7 +237,7 @@
   let origins =[];
   let sortdests =[];
   
-  var markersArray = [];
+  let markersArray = [];
   
   function initMap() {
 
@@ -251,16 +252,27 @@
       
        var geocoder = new google.maps.Geocoder();
        var service = new google.maps.DistanceMatrixService;
+       directionsRenderer.setMap(map);
 
         document.getElementById('mapbtn').addEventListener('click', function() {
           if (prepareData()){
-            //console.log(origins);
-            console.log(dests);
-            //console.log(selectedlocations);
+            
+            
+           
             var adds= [document.getElementById('addrm').value.trim()];
-            //geocodeAddress(geocoder, map, adds, 0);
-            console.log(adds);
-            disMaxtrix(service, geocoder, map, adds, dests, sortdests, bounds, 1)
+           
+            //getGeocoder(adds,geocoder,service, geocoder, map, origins, dests, sortdests, bounds,directionsService, directionsRenderer)
+            //console.log(origins.length)
+
+            // if (origins.length>0){
+
+              disMaxtrix(service, geocoder, map, adds, dests, sortdests, bounds, directionsService, directionsRenderer)
+              //calculateAndDisplayRoute(directionsService, directionsRenderer,sortdests,origins)
+              //console.log(dests);
+              //console.log(origins);
+            // }
+           
+
           }
           
         });
@@ -270,7 +282,7 @@
            selectedlocations =[];
            dests =[]
            origins =[];
-           sortdest =[];
+           sortdests =[];
           var valid = true;
           var checkedValue = document.querySelectorAll('.check-item:checked');
           var errmap = document.getElementById('errmap');
@@ -289,7 +301,7 @@
 
         }
           var start = document.getElementById('addrm');
-          console.log(start.value)
+          //console.log(start.value)
           if(start == null){
             valid = false;
           }else{
@@ -316,11 +328,17 @@
         markersArray = [];
       }
 
-      //https://developers.google.com/maps/documentation/javascript/examples/distance-matrix
-      function disMaxtrix(service, geocoder, map,org, dests, sortdests, bounds){
 
+      
+
+      //https://developers.google.com/maps/documentation/javascript/examples/distance-matrix
+      function disMaxtrix( service, geocoder, map, origins, dests, sortdests, bounds,directionsService, directionsRenderer){
+
+       
+       // console.log(dests);
+        //console.log(origins);
         service.getDistanceMatrix({
-          origins: org,
+          origins: origins,
           destinations: dests,
           travelMode: 'DRIVING',
           unitSystem: google.maps.UnitSystem.METRIC,
@@ -335,14 +353,7 @@
             var outputDiv = document.getElementById('output');
             outputDiv.innerHTML = '';
             deleteMarkers(markersArray);
-
-            for(var i = 0; i < destinationList.length; i++){
-              
-
-            }
-            
-
-
+           
 
             var showGeocodedAddressOnMap = function(asDestination,j) {
               var destinationIcon = 'https://chart.googleapis.com/chart?' +
@@ -364,80 +375,102 @@
               };
             };
 
+            //sort based on distances
+            var result = response.rows[0].elements;
+                  for(var i = 0; i < destinationList.length; i++){
+                    let add=[destinationList[i], parseFloat(result[i].distance.text)];
+                    sortdests.push(add);
+                    //newdests.push(add);
+                  };
+                  sortdests.sort(function(first, second) {
+                        return first[1] - second[1];
+                        });
+                // console.log(sortdests) 
+          
+            //   var waypts = [];
+            //   for (var i = 0; i < sortdests.length-1; i++) {
+              
+            //       waypts.push({
+            //         location: sortdests[i][0],
+            //         stopover: true
+            //       });
+              
+            //   }
+            //  console.log(waypts)
+            
+            
+
+            
             for (var i = 0; i < originList.length; i++) {
               var results = response.rows[i].elements;
               geocoder.geocode({'address': originList[i]},
-                  showGeocodedAddressOnMap(false, 0));
-              for (var j = 0; j < results.length; j++) {
+                 showGeocodedAddressOnMap(false, 0));
+              for (var j = 0; j < sortdests.length; j++) {
                 geocoder.geocode({'address': destinationList[j]},
-                    showGeocodedAddressOnMap(true, j));
-                outputDiv.innerHTML += originList[i] + ' to ' + destinationList[j] +
-                    ': ' + results[j].distance.text + ' in ' +
-                    results[j].duration.text + '<br>';
+                showGeocodedAddressOnMap(true,j)
+                   );
+                   outputDiv.innerHTML += originList[i] + ' to ' + sortdests[j] +
+                    ': ' + results[j].distance.text + ' in ' +'<br>';
+                    console.log(destinationList[j])
+
               }
             }
-          }
+         }
         });
 
 
-
-
-      }
-
-      //https://developers.google.com/maps/documentation/javascript/examples/directions-simple
-      function calculateAndDisplayRoute(directionsService, directionsRenderer, start, end) {
-        directionsService.route(
-            {
-              origin: {query: start},
-              destination: {query: end},
-              travelMode: 'DRIVING'
-            },
-            function(response, status) {
-              if (status === 'OK') {
-                directionsRenderer.setDirections(response);
-              } else {
-                window.alert('Directions request failed due to ' + status);
-              }
-            });
-      }
-
       
 
-    //  function geocodeAddress(geocoder, resultsMap, adds, mode) {
+      }
+
+      //https://developers.google.com/maps/documentation/javascript/examples/directions-waypoints
+      // function calculateAndDisplayRoute(directionsService, directionsRenderer,sortdests,origins) {
+      //   var waypts = [];
+      //   for (var i = 0; i < sortdests.length-1; i++) {
+         
+      //       waypts.push({
+      //         location: sortdests[i][1],
+      //         stopover: true
+      //       });
         
-    //     //var adds=["1100 Lloyd Center, Portland, OR 97232", "9700 SW Washington Square Rd, Tigard, OR 97223"]
-       
-    //     for (i = 0; i < adds.length; i++) {
-    //     geocoder.geocode({'address': adds[i]}, function(results, status) {
-    //       if (status === 'OK') {
-    //         resultsMap.setCenter(results[0].geometry.location);
-    //         console.log(results[0])
-    //         var marker = new google.maps.Marker({
-    //           map: resultsMap,
-    //           position: results[0].geometry.location
-    //         });
-    //        //float window to show first return address from google map
-    //        var infowindow = new google.maps.InfoWindow;
-    //        infowindow.setContent(results[0].formatted_address);
-    //        if (mode=0){
-    //         origins[0] = results[0].formatted_address;
-    //        }
-           
-    //        marker.addListener('click', function() {
-    //         infowindow.open(map, marker);
-    //        });
-    //       } else {
-    //         alert('Geocode was not successful for the following reason: ' + status);
-    //       }
-    //     });
-    //   }
+      //   }
+
+      //   console.log(origins);
+      //   console.log(dests);
+
+      //   directionsService.route({
+      //     origin: origins[0],
+      //     destination: sortdests[-1][1],
+      //     waypoints: waypts,
+      //     optimizeWaypoints: true,
+      //     travelMode: 'DRIVING'
+      //   }, function(response, status) {
+      //     if (status === 'OK') {
+      //       directionsRenderer.setDirections(response);
+      //       var route = response.routes[0];
+      //       var summaryPanel = document.getElementById('output');
+      //       summaryPanel.innerHTML = '';
+      //       // For each route, display summary information.
+      //       for (var i = 0; i < route.legs.length; i++) {
+      //         var routeSegment = i + 1;
+      //         summaryPanel.innerHTML += '<b>Route Segment: ' + routeSegment +
+      //             '</b><br>';
+      //         summaryPanel.innerHTML += route.legs[i].start_address + ' to ';
+      //         summaryPanel.innerHTML += route.legs[i].end_address + '<br>';
+      //         summaryPanel.innerHTML += route.legs[i].distance.text + '<br><br>';
+      //       }
+      //     } else {
+      //       window.alert('Directions request failed due to ' + status);
+      //     }
+      //   });
+      // }
+      
 
 
 
 
 
-
-   }
+   
 
 
 </script>
